@@ -1,25 +1,14 @@
-// index.js
-
 // Імпортуємо необхідні бібліотеки
 const TelegramBot = require('node-telegram-bot-api');
 const mysql = require('mysql2/promise');
 const { env } = require('./envConfig');
+const { streamsDict, dirrectionsBtns } = require('./constants');
 
 // --- КОНФІГУРАЦІЯ ---
 
 // Токен вашого Telegram бота
 const API_TOKEN = env.TG_API_TOKEN;
 
-// Дані для підключення до бази даних
-/* const dbConfig = {
-  host: 'localhost',
-  user: 'lpunitlz_neo',
-  password: 'v*U&9pyHixs%',
-  database: 'lpunitlz_neo',
-  waitForConnections: true,
-  connectionLimit: 10,
-  queueLimit: 0,
-}; */
 const dbConfig = {
   host: env.DB_HOST,
   user: env.DB_USER,
@@ -30,47 +19,14 @@ const dbConfig = {
   queueLimit: 0,
 };
 
-// Змінні для потоків (аналогічно до PHP)
-const S_1 = 'MCS_1';
-const S_2 = 'MCS_2';
-const S_3 = 'MCS_3';
-const S_4 = 'MCS_4';
-const S_5 = 'MCS_5';
-const S_6 = 'MCS_6';
-const S_7 = 'MCS_7';
-const S_8 = 'MCS_8';
-const S_9 = 'MCS_9';
-const S_10 = 'MCS_10';
-const Data_1 = 'MDS_1';
-const Data_2 = 'MDS_2';
-const Data_3 = 'MDS_3';
-const Data_4 = 'MDS_4';
-const Data_5 = 'MDS_5';
-const Data_6 = 'MDS_6';
-const Data_7 = 'MDS_7';
-const Data_8 = 'MDS_8';
-const Syber_1 = 'MCbS_1';
-const Syber_2 = 'MCbS_2';
-const Syber_3 = 'MCbS_3';
-const Syber_4 = 'MCbS_4';
-const Syber_5 = 'MCbS_5';
-const Syber_6 = 'MCbS_6';
-const Inter_1 = 'MSHCID_1';
-const Inter_2 = 'MSHCID_2';
-const Inter_3 = 'MSHCID_3';
-
 // --- ІНІЦІАЛІЗАЦІЯ ---
 
-// Створюємо пул з'єднань з БД для ефективної роботи
 const db = mysql.createPool({ ...dbConfig, port: env.DB_PORT || 3306 });
-
-// Ініціалізуємо бота
 const bot = new TelegramBot(API_TOKEN, { polling: true });
 
 console.log('Бот успішно запущений...');
 
 // --- ОБРОБКА КОМАНД І ПОВІДОМЛЕНЬ ---
-
 bot.on('message', async (msg) => {
   const chatId = msg.chat.id;
   const text = msg.text || '';
@@ -79,7 +35,6 @@ bot.on('message', async (msg) => {
     const registrationStage = await getRegistrationStage(chatId);
     const editStage = await getEditStage(chatId);
 
-    // Головний роутер текстових команд
     if (text === '/start') {
       if (registrationStage === 'completed') {
         await sendMainMenu(chatId);
@@ -288,25 +243,11 @@ async function sendUserProfile(chatId) {
  * Надсилає кнопки для вибору напрямку навчання
  * @param {number} chatId ID чату
  */
+
 async function sendDirectionSelectionButtons(chatId) {
   const options = {
     reply_markup: {
-      inline_keyboard: [
-        [{ text: 'Software Engineering', callback_data: 'direction_Software' }],
-        [
-          {
-            text: 'Data Science & Data Analytics',
-            callback_data: 'direction_Data',
-          },
-        ],
-        [{ text: 'Cybersecurity', callback_data: 'direction_Cybersecurity' }],
-        [
-          {
-            text: 'Human-Computer Interaction and Design',
-            callback_data: 'direction_Interaction',
-          },
-        ],
-      ],
+      inline_keyboard: dirrectionsBtns,
     },
   };
   await bot.sendMessage(chatId, '👉 Оберіть ваш напрямок:', options);
@@ -318,59 +259,7 @@ async function sendDirectionSelectionButtons(chatId) {
  * @param {string} direction Напрямок навчання
  */
 async function sendStreamSelectionButtons(chatId, direction) {
-  let streams = [];
-  if (direction === 'Software') {
-    streams = [
-      [
-        { text: '1️⃣', callback_data: `stream_${S_1}` },
-        { text: '2️⃣', callback_data: `stream_${S_2}` },
-        { text: '3️⃣', callback_data: `stream_${S_3}` },
-        { text: '4️⃣', callback_data: `stream_${S_4}` },
-        { text: '5️⃣', callback_data: `stream_${S_5}` },
-      ],
-      [
-        { text: '6️⃣', callback_data: `stream_${S_6}` },
-        { text: '7️⃣', callback_data: `stream_${S_7}` },
-        { text: '8️⃣', callback_data: `stream_${S_8}` },
-        { text: '9️⃣', callback_data: `stream_${S_9}` },
-        { text: '🔟', callback_data: `stream_${S_10}` },
-      ],
-    ];
-  } else if (direction === 'Data') {
-    streams = [
-      [
-        { text: '1️⃣', callback_data: `stream_${Data_1}` },
-        { text: '2️⃣', callback_data: `stream_${Data_2}` },
-        { text: '3️⃣', callback_data: `stream_${Data_3}` },
-        { text: '4️⃣', callback_data: `stream_${Data_4}` },
-      ],
-      [
-        { text: '5️⃣', callback_data: `stream_${Data_5}` },
-        { text: '6️⃣', callback_data: `stream_${Data_6}` },
-        { text: '7️⃣', callback_data: `stream_${Data_7}` },
-        { text: '8️⃣', callback_data: `stream_${Data_8}` },
-      ],
-    ];
-  } else if (direction === 'Cybersecurity') {
-    streams = [
-      [
-        { text: '1️⃣', callback_data: `stream_${Syber_1}` },
-        { text: '2️⃣', callback_data: `stream_${Syber_2}` },
-        { text: '3️⃣', callback_data: `stream_${Syber_3}` },
-        { text: '4️⃣', callback_data: `stream_${Syber_4}` },
-        { text: '5️⃣', callback_data: `stream_${Syber_5}` },
-        { text: '6️⃣', callback_data: `stream_${Syber_6}` },
-      ],
-    ];
-  } else if (direction === 'Interaction') {
-    streams = [
-      [
-        { text: '1️⃣', callback_data: `stream_${Inter_1}` },
-        { text: '2️⃣', callback_data: `stream_${Inter_2}` },
-        { text: '3️⃣', callback_data: `stream_${Inter_3}` },
-      ],
-    ];
-  }
+  const streams = streamsDict[direction] || [];
 
   if (streams.length > 0) {
     await bot.sendMessage(chatId, '👉 Оберіть ваш потік:', {
