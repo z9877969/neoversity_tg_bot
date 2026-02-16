@@ -620,7 +620,9 @@ async function getUserStream(chatId) {
 // Універсальні функції збереження. INSERT ... ON DUPLICATE KEY UPDATE більш ефективний.
 async function saveUserFullName(chatId, fullName, isEdit = false) {
   const sql =
-    "INSERT INTO users (telegram_id, full_name, registration_stage) VALUES (?, ?, 'waiting_for_email') ON DUPLICATE KEY UPDATE full_name = ?";
+    "INSERT INTO users (telegram_id, full_name, registration_stage) \
+    VALUES (?, ?, 'waiting_for_email') \
+    ON DUPLICATE KEY UPDATE full_name = ?";
   await db.execute(sql, [chatId, fullName, fullName]);
   if (isEdit) {
     await bot.sendMessage(chatId, "Ім'я збережено ✅");
