@@ -413,7 +413,7 @@ async function sendManagerContacts(chatId) {
   if (contacts.length > 0) {
     let contactsMessage = '<b>Контакти менеджерів:</b>\n\n';
     contacts.forEach((c) => {
-      contactsMessage += `👤 ${c.manager_name}\n✉️ Email: ${c.manager_email}\n📞 Телефон: ${c.manager_phone}\n\n`;
+      contactsMessage += `👤 ${c.manager_name}\n✉️ Email: ${c.manager_email}\n📞 Телеграм: ${c.manager_phone}\n\n`;
     });
     await bot.sendMessage(chatId, contactsMessage.trim(), {
       parse_mode: 'HTML',
