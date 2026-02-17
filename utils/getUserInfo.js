@@ -1,3 +1,5 @@
+const { directions } = require('../constants');
+
 const getUserStreamName = (stream) => {
   const streamName = stream.replace(/_\d+$/, '');
   const [_, streamNumber] = stream.split(streamName + '_');
