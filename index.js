@@ -2,7 +2,8 @@
 const TelegramBot = require('node-telegram-bot-api');
 const mysql = require('mysql2/promise');
 const { env } = require('./envConfig');
-const { streamsDict, dirrectionsBtns } = require('./constants');
+const { streamsDict, directionsBtns, directions } = require('./constants');
+const { getUserInfo } = require('./utils');
 
 // --- КОНФІГУРАЦІЯ ---
 
@@ -215,14 +216,15 @@ async function sendUserProfile(chatId) {
     'SELECT full_name, email, direction, stream FROM users WHERE telegram_id = ?',
     [chatId],
   );
+
   if (rows.length > 0) {
     const user = rows[0];
     const profileMessage =
       `<b>👤 Ваш профіль</b>\n` +
       `<b>Ім'я:</b> ${user.full_name || 'не вказано'}\n` +
       `<b>Email:</b> ${user.email || 'не вказано'}\n` +
-      `<b>Напрямок:</b> ${user.direction || 'не вказано'}\n` +
-      `<b>Потік:</b> ${user.stream || 'не вказано'}\n`;
+      `<b>Напрямок:</b> ${getUserInfo.directionName(user.direction) || 'не вказано'}\n` +
+      `<b>Потік:</b> ${getUserInfo.streamName(user.stream) || 'не вказано'}\n`;
 
     const options = {
       parse_mode: 'HTML',
@@ -247,7 +249,7 @@ async function sendUserProfile(chatId) {
 async function sendDirectionSelectionButtons(chatId) {
   const options = {
     reply_markup: {
-      inline_keyboard: dirrectionsBtns,
+      inline_keyboard: directionsBtns,
     },
   };
   await bot.sendMessage(chatId, '👉 Оберіть ваш напрямок:', options);
