@@ -21,11 +21,12 @@ async function email(chatId, email, isEdit = false) {
 
 async function direction(chatId, direction) {
   await dbApi.setUserDirection(chatId, direction);
+  await sendSuccessMessage.direction(chatId, direction);
 }
 
 async function stream(chatId, stream) {
   await dbApi.setUserStream(chatId, stream);
-  await sendSuccessMessage.stream(chatId);
+  await sendSuccessMessage.stream(chatId, stream);
 }
 
 module.exports = {

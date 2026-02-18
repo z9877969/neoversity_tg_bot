@@ -1,5 +1,6 @@
 // Імпортуємо необхідні бібліотеки
 
+const { directions } = require('./constants');
 const { dbApi, tgApi } = require('./services');
 
 const { bot } = tgApi;
