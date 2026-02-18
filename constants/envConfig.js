@@ -1,6 +1,6 @@
 require('dotenv/config');
 
-module.exports.env = { 
+module.exports = { 
     TG_API_TOKEN: process.env.TG_API_TOKEN,
     DB_HOST: process.env.DB_HOST,
     DB_USER: process.env.DB_USER,
