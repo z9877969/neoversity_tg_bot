@@ -1,3 +1,4 @@
+const { convertToTelegramHtml } = require('../../utils');
 const { dbApi } = require('../index');
 const bot = require('./tgApi');
 
@@ -11,7 +12,7 @@ async function sendFAQAnswer(chatId, faqId) {
   if (faq) {
     await bot.sendMessage(
       chatId,
-      `❓ <b>${faq.question}</b>\n\n${faq.answer}`,
+      `❓ <b>${faq.question}</b>\n\n${convertToTelegramHtml(faq.answer)}`,
       { parse_mode: 'HTML' },
     );
   }
