@@ -1,6 +1,5 @@
 // Імпортуємо необхідні бібліотеки
 
-const { directionsBtns } = require('./constants');
 const { dbApi, tgApi } = require('./services');
 
 const { bot } = tgApi;
@@ -110,7 +109,6 @@ bot.on('message', async (msg) => {
 });
 
 // --- ОБРОБКА НАТИСКАНЬ НА INLINE-КНОПКИ ---
-
 bot.on('callback_query', async (callbackQuery) => {
   const chatId = callbackQuery.from.id;
   const data = callbackQuery.data;
