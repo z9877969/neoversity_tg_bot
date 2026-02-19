@@ -145,13 +145,27 @@ async function setUserStream(chatId, stream) {
 }
 // ========================
 
-const getManagerContactsByStream = async (stream) => {
+async function getManagerContactsByStream(stream) {
   const [rows] = await db.execute(
     'SELECT manager_name, manager_email, manager_phone FROM manager_contacts WHERE FIND_IN_SET(?, managers_streams)',
     [stream],
   );
   return rows.length > 0 ? rows : null;
-};
+}
+
+async function checkRegistrationStatus(chatId) {
+  const unregisterFieldData = await getUserUnregisterFieldData(chatId);
+
+  if (unregisterFieldData?.stage === types.registrationResults.COMPLETED) {
+    return types.registrationResults.COMPLETED;
+  }
+
+  if (unregisterFieldData?.stage === types.registrationResults.NOT_COMPLETED) {
+    return types.registrationResults.NOT_COMPLETED;
+  }
+
+  return types.registrationResults.NOT_REGISTERED;
+}
 
 module.exports = {
   db,
@@ -172,4 +186,5 @@ module.exports = {
   setUserDirection,
   setUserStream,
   getManagerContactsByStream,
+  checkRegistrationStatus,
 };
