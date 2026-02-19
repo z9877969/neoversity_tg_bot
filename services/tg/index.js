@@ -11,4 +11,5 @@ module.exports = {
   sendManagerContacts: require('./sendManagerContacts'),
   sendSuccessMessage: require('./sendSuccessMessage'),
   saveUserInfo: require('./saveUserInfo'),
+  sendWrongRegistrationActionsMessage: require('./sendWrongRegistrationActionsMessage'),
 };
