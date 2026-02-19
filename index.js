@@ -57,8 +57,15 @@ bot.on('message', async (msg) => {
         await dbApi.setEditStage(chatId, types.editingTypes.WAITING_FOR_EMAIL);
         await bot.sendMessage(chatId, 'Введіть новий email:');
       } else if (editStage === types.editingTypes.WAITING_FOR_EMAIL) {
-        await tgApi.saveUserInfo.email(chatId, text, true); // true - означає редагування
-        await dbApi.setEditStage(chatId, 'null');
+        if (/\S+@\S+\.\S+/.test(text)) {
+          await tgApi.saveUserInfo.email(chatId, text, true); // true - означає редагування
+          await dbApi.setEditStage(chatId, 'null');
+        } else {
+          await bot.sendMessage(
+            chatId,
+            '❌ Eлектронна пошта введена неправильно',
+          );
+        }
       } else if (text === 'Редагувати напрямок') {
         await dbApi.setEditStage(
           chatId,
