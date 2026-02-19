@@ -155,15 +155,15 @@ async function getManagerContactsByStream(stream) {
 async function checkRegistrationStatus(chatId) {
   const unregisterFieldData = await getUserUnregisterFieldData(chatId);
 
+  if (unregisterFieldData === null) {
+    return types.registrationResults.NOT_REGISTERED;
+  }
+
   if (unregisterFieldData?.stage === types.registrationResults.COMPLETED) {
     return types.registrationResults.COMPLETED;
   }
 
-  if (unregisterFieldData?.stage === types.registrationResults.NOT_COMPLETED) {
-    return types.registrationResults.NOT_COMPLETED;
-  }
-
-  return types.registrationResults.NOT_REGISTERED;
+  return unregisterFieldData.stage;
 }
 
 module.exports = {
