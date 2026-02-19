@@ -29,6 +29,13 @@ async function initializeUser(chatId) {
   await db.execute(sql, [chatId]);
 }
 
+async function setCompleteRegistration(chatId) {
+  await db.execute(
+    'UPDATE users SET registration_stage = ? WHERE telegram_id = ?',
+    [types.registrationResults.COMPLETED, chatId],
+  );
+}
+
 async function getUserUnregisterFieldData(chatId) {
   const userData = await getUserData(chatId);
   if (!userData) {
@@ -169,6 +176,7 @@ async function checkRegistrationStatus(chatId) {
 module.exports = {
   db,
   initializeUser,
+  setCompleteRegistration,
   getUserUnregisterFieldData,
   setRegistrationStage,
   setEditStage,

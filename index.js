@@ -157,6 +157,7 @@ bot.on('callback_query', async (callbackQuery) => {
       } else if (data.startsWith('stream_')) {
         const stream = data.replace('stream_', '');
         await tgApi.saveUserInfo.stream(chatId, stream);
+        await dbApi.setCompleteRegistration(chatId);
         await tgApi.sendMainMenu(chatId, isRegistrationCompleted); // true - показати повідомлення про успішну реєстрацію
       } else {
         await tgApi.sendWrongRegistrationActionsMessage(chatId);
