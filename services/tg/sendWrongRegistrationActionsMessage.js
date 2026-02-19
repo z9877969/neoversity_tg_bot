@@ -13,15 +13,12 @@ const callbackMessageSenderMap = {
 /**
  * Перевіряє стан реєстрації користувача та надсилає відповідне повідомлення, якщо реєстрація не завершена.
  * @param {number} chatId ID чату
- * @param {Object} registrationData - Дані про стан реєстрації користувача
- * @param {string} registrationData.stage - Поточний етап реєстрації 
- * @param {string} registrationData.field - Поле, яке не було заповнено
  */
 
-const sendWrongRegistrationActionsMessage = async (
-  chatId,
-  { stage, field },
-) => {
+const sendWrongRegistrationActionsMessage = async (chatId) => {
+  const unregisterFieldData = await dbApi.getUserUnregisterFieldData(chatId);
+  if (unregisterFieldData === null) return null;
+  const { stage, field } = unregisterFieldData;
   if (stage !== types.registartionStages[field].value) {
     const messageText = createUnregisterUserMessage(field);
     await bot.sendMessage(

@@ -1,5 +1,12 @@
 const types = require('../constants/types');
 
+/**
+ * Перевіряє, які поля користувача не заповнені, і повертає інформацію про перше незаповнене поле.
+ * @param {Object} userData - Дані користувача з БД
+ * @returns {Array} [{stage, field}] - Масив об'єктів з інформацією про незаповнені поля 
+ * та відповідні впорядковані етапи реєстрації
+ */
+
 const getMissingUserDataFields = (userData) => {
   const missingUserData = Object.entries(userData)
     .reduce((acc, [key, value]) => {
