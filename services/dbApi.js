@@ -24,16 +24,12 @@ async function setRegistrationStage(chatId, stage) {
 }
 
 async function initializeUser(chatId) {
-  const sql = `INSERT INTO users (telegram_id, registration_stage)
-      VALUES (?, ${types.registartionTypes.WAITING_FOR_NAME}) `;
+  const sql = `INSERT INTO users (telegram_id) VALUES (?)`;
   await db.execute(sql, [chatId]);
 }
 
 async function setCompleteRegistration(chatId) {
-  await db.execute(
-    'UPDATE users SET registration_stage = ? WHERE telegram_id = ?',
-    [types.registrationResults.COMPLETED, chatId],
-  );
+  await setRegistrationStage(chatId, types.registrationResults.COMPLETED);
 }
 
 async function getUserUnregisterFieldData(chatId) {

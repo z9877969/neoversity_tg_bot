@@ -48,36 +48,33 @@ bot.on('message', async (msg) => {
       }
       // Логіка редагування профілю для зареєстрованих користувачів
       else if (text === "Редагувати ім'я") {
-        await dbApi.setEditStage(chatId, 'edit_full_name');
+        await dbApi.setEditStage(chatId, types.editingTypes.WAITING_FOR_NAME);
         await bot.sendMessage(chatId, "Введіть нове ім'я:");
-      } else if (editStage === 'edit_full_name') {
+      } else if (editStage === types.editingTypes.WAITING_FOR_NAME) {
         await tgApi.saveUserInfo.fullName(chatId, text, true); // true - означає редагування
         await dbApi.setEditStage(chatId, 'null');
       } else if (text === 'Редагувати email') {
-        await dbApi.setEditStage(chatId, 'edit_email');
+        await dbApi.setEditStage(chatId, types.editingTypes.WAITING_FOR_EMAIL);
         await bot.sendMessage(chatId, 'Введіть новий email:');
-      } else if (editStage === 'edit_email') {
+      } else if (editStage === types.editingTypes.WAITING_FOR_EMAIL) {
         await tgApi.saveUserInfo.email(chatId, text, true); // true - означає редагування
         await dbApi.setEditStage(chatId, 'null');
       } else if (text === 'Редагувати напрямок') {
         await dbApi.setEditStage(
           chatId,
-          types.registartionTypes.WAITING_FOR_DIRECTION,
+          types.editingTypes.WAITING_FOR_DIRECTION,
         );
         await tgApi.sendDirectionSelectionButtons(chatId);
       } else if (text === 'Редагувати потік') {
         const direction = await dbApi.getUserDirection(chatId);
-        await dbApi.setEditStage(
-          chatId,
-          types.registartionTypes.WAITING_FOR_STREAM,
-        );
+        await dbApi.setEditStage(chatId, types.editingTypes.WAITING_FOR_STREAM);
         await tgApi.sendStreamSelectionButtons(chatId, direction);
       }
       // Якщо команду не розпізнано
       else {
-        if (editStage === types.registartionTypes.WAITING_FOR_DIRECTION) {
+        if (editStage === types.editingTypes.WAITING_FOR_DIRECTION) {
           await tgApi.sendDirectionSelectionButtons(chatId);
-        } else if (editStage === types.registartionTypes.WAITING_FOR_STREAM) {
+        } else if (editStage === types.editingTypes.WAITING_FOR_STREAM) {
           const direction = await dbApi.getUserDirection(chatId);
           await tgApi.sendStreamSelectionButtons(chatId, direction);
         } else {
@@ -91,14 +88,12 @@ bot.on('message', async (msg) => {
     // Логіка реєстрації
     else {
       if (
-        registrationStatus === types.registartionTypes.WAITING_FOR_NAME &&
+        registrationStatus === types.editingTypes.WAITING_FOR_NAME &&
         /^[\p{L} '-]+$/u.test(text)
       ) {
         await tgApi.saveUserInfo.fullName(chatId, text);
         await bot.sendMessage(chatId, 'Тепер надішліть вашу електронну пошту');
-      } else if (
-        registrationStatus === types.registartionTypes.WAITING_FOR_EMAIL
-      ) {
+      } else if (registrationStatus === types.editingTypes.WAITING_FOR_EMAIL) {
         if (/\S+@\S+\.\S+/.test(text)) {
           // Проста валідація email
           await tgApi.saveUserInfo.email(chatId, text);
@@ -110,8 +105,8 @@ bot.on('message', async (msg) => {
           );
         }
       } else if (
-        registrationStatus === types.registartionTypes.WAITING_FOR_DIRECTION ||
-        registrationStatus === types.registartionTypes.WAITING_FOR_STREAM
+        registrationStatus === types.editingTypes.WAITING_FOR_DIRECTION ||
+        registrationStatus === types.editingTypes.WAITING_FOR_STREAM
       ) {
         await tgApi.sendWrongRegistrationActionsMessage(chatId);
       }
@@ -124,12 +119,6 @@ bot.on('message', async (msg) => {
     );
   }
 });
-
-/* 
- - після вибору напрямку обов'зково надавати вибор потоку
- - при спробі ввести повідомлення на етапі вибору потоку повернути до вибору потоку 
- або вивести повідомлення
- */
 
 // --- ОБРОБКА НАТИСКАНЬ НА INLINE-КНОПКИ ---
 bot.on('callback_query', async (callbackQuery) => {
@@ -168,10 +157,7 @@ bot.on('callback_query', async (callbackQuery) => {
     if (data.startsWith('direction_')) {
       const direction = data.replace('direction_', '');
       await tgApi.saveUserInfo.direction(chatId, direction);
-      await dbApi.setEditStage(
-        chatId,
-        types.registartionTypes.WAITING_FOR_STREAM,
-      );
+      await dbApi.setEditStage(chatId, types.editingTypes.WAITING_FOR_STREAM);
       await tgApi.sendStreamSelectionButtons(chatId, direction);
     } else if (data.startsWith('stream_')) {
       const stream = data.replace('stream_', '');

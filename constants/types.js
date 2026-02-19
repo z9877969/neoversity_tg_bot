@@ -5,7 +5,7 @@ const dbUserDataFields = {
   STREAM: 'stream',
 };
 
-const registartionTypes = {
+const editingTypes = {
   WAITING_FOR_NAME: 'waiting_for_name',
   WAITING_FOR_EMAIL: 'waiting_for_email',
   WAITING_FOR_DIRECTION: 'waiting_for_direction',
@@ -15,30 +15,30 @@ const registartionTypes = {
 const registartionStages = {
   [dbUserDataFields.FULL_NAME]: {
     step: 1,
-    value: registartionTypes.WAITING_FOR_NAME,
+    value: editingTypes.WAITING_FOR_NAME,
   },
   [dbUserDataFields.EMAIL]: {
     step: 2,
-    value: registartionTypes.WAITING_FOR_EMAIL,
+    value: editingTypes.WAITING_FOR_EMAIL,
   },
   [dbUserDataFields.DIRECTION]: {
     step: 3,
-    value: registartionTypes.WAITING_FOR_DIRECTION,
+    value: editingTypes.WAITING_FOR_DIRECTION,
   },
   [dbUserDataFields.STREAM]: {
     step: 4,
-    value: registartionTypes.WAITING_FOR_STREAM,
+    value: editingTypes.WAITING_FOR_STREAM,
   },
 };
 
 const callbackTypes = {
-  [dbUserDataFields.DIRECTION]: registartionTypes.WAITING_FOR_DIRECTION,
-  [dbUserDataFields.STREAM]: registartionTypes.WAITING_FOR_STREAM,
+  [dbUserDataFields.DIRECTION]: editingTypes.WAITING_FOR_DIRECTION,
+  [dbUserDataFields.STREAM]: editingTypes.WAITING_FOR_STREAM,
 };
 
 const messageTypes = {
-  [dbUserDataFields.FULL_NAME]: registartionTypes.WAITING_FOR_NAME,
-  [dbUserDataFields.EMAIL]: registartionTypes.WAITING_FOR_EMAIL,
+  [dbUserDataFields.FULL_NAME]: editingTypes.WAITING_FOR_NAME,
+  [dbUserDataFields.EMAIL]: editingTypes.WAITING_FOR_EMAIL,
 };
 
 const registrationResults = {
@@ -50,7 +50,7 @@ const registrationResults = {
 module.exports = {
   dbUserDataFields,
   registartionStages,
-  registartionTypes,
+  editingTypes,
   callbackTypes,
   messageTypes,
   registrationResults,
