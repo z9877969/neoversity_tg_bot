@@ -50,7 +50,6 @@ async function setEditStage(chatId, stage) {
 
 async function getUserStage(chatId) {
   const [rows] = await db.execute(
-    // 'SELECT edit_stage FROM users WHERE telegram_id = ?',
     'SELECT edit_stage, registration_stage FROM users WHERE telegram_id = ?',
     [chatId],
   );
