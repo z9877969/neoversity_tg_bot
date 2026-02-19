@@ -1,23 +1,40 @@
-// Імпортуємо необхідні бібліотеки
-
-const { directions } = require('./constants');
+const { types } = require('./constants');
 const { dbApi, tgApi } = require('./services');
 
 const { bot } = tgApi;
 
 console.log('Бот успішно запущений...');
 
-// --- ОБРОБКА КОМАНД І ПОВІДОМЛЕНЬ ---
+// --- ОБРОБКА ТЕКСТОВИХ КОМАНД І ПОВІДОМЛЕНЬ ---
 bot.on('message', async (msg) => {
   const chatId = msg.chat.id;
   const text = msg.text || '';
 
+  console.log('text :>> ', text);
+
   try {
-    const registrationStage = await dbApi.getRegistrationStage(chatId);
-    const editStage = await dbApi.getEditStage(chatId);
+    // Перевіряємо, чи користувач завершив реєстрацію
+    const registrationStatus =
+      await tgApi.sendWrongRegistrationActionsMessage(chatId);
+
+    if (registrationStatus === types.registrationResults.NOT_COMPLETED) {
+      return; // Якщо реєстрація не завершена, припиняємо обробку подальших команд
+    }
+
+    const { edit_stage: editStage, registration_stage: registrationStage } =
+      await dbApi.getUserStage(chatId);
+
+    if (registrationStage === types.registrationResults.NOT_REGISTERED) {
+      await dbApi.initializeUser(chatId);
+      await bot.sendMessage(
+        chatId,
+        '👉 Зареєструйтесь! Введіть ваше прізвище та імʼя. Наприклад: Бубоненко Анатолій',
+      );
+      return;
+    }
 
     if (text === '/start') {
-      if (registrationStage === 'completed') {
+      if (registrationStatus === types.registrationResults.COMPLETED) {
         await tgApi.sendMainMenu(chatId);
       } else {
         await dbApi.setRegistrationStage(chatId, 'waiting_for_name');
@@ -26,42 +43,56 @@ bot.on('message', async (msg) => {
           '👉 Введіть ваше прізвище та імʼя. Наприклад: Бубоненко Анатолій',
         );
       }
-    } else if (text === '👤 Мій профіль' && registrationStage === 'completed') {
+    } else if (
+      text === '👤 Мій профіль' &&
+      registrationStage === types.registrationResults.COMPLETED
+    ) {
       await tgApi.sendUserProfile(chatId);
     } else if (
       text === '❔ Часті питання' &&
-      registrationStage === 'completed'
+      registrationStage === types.registrationResults.COMPLETED
     ) {
       await tgApi.sendFAQList(chatId);
     } else if (
       text === '💬 Контакти менеджера' &&
-      registrationStage === 'completed'
+      registrationStage === types.registrationResults.COMPLETED
     ) {
       await tgApi.sendManagerContacts(chatId);
     } else if (
       text === '📋 Додаткові послуги' &&
-      registrationStage === 'completed'
+      registrationStage === types.registrationResults.COMPLETED
     ) {
       await tgApi.sendServiceList(chatId);
-    } else if (text === '📅 Мій графік' && registrationStage === 'completed') {
-      await tgApi.sendScheduleDetails(chatId);
-    } else if (text === '⬅️ Назад' && registrationStage === 'completed') {
+    } else if (
+      text === '⬅️ Назад' &&
+      registrationStage === types.registrationResults.COMPLETED
+    ) {
       await dbApi.setEditStage(chatId, 'null');
       await tgApi.sendMainMenu(chatId);
     }
     // Логіка реєстрації
     else if (
-      registrationStage === 'waiting_for_name' &&
+      registrationStage ===
+        types.registartionStages[types.dbUserDataFields.FULL_NAME].value &&
       /^[\p{L} '-]+$/u.test(text)
     ) {
       await tgApi.saveUserInfo.fullName(chatId, text);
-      await dbApi.setRegistrationStage(chatId, 'waiting_for_email');
+      await dbApi.setRegistrationStage(
+        chatId,
+        types.registartionStages[types.dbUserDataFields.EMAIL].value,
+      );
       await bot.sendMessage(chatId, 'Тепер надішліть вашу електронну пошту');
-    } else if (registrationStage === 'waiting_for_email') {
+    } else if (
+      registrationStage ===
+      types.registartionStages[types.dbUserDataFields.EMAIL].value
+    ) {
       if (/\S+@\S+\.\S+/.test(text)) {
         // Проста валідація email
         await tgApi.saveUserInfo.email(chatId, text);
-        await dbApi.setRegistrationStage(chatId, 'waiting_for_direction');
+        await dbApi.setRegistrationStage(
+          chatId,
+          types.registartionStages[types.dbUserDataFields.DIRECTION].value,
+        );
         await tgApi.sendDirectionSelectionButtons(chatId);
       } else {
         await bot.sendMessage(
@@ -115,24 +146,42 @@ bot.on('callback_query', async (callbackQuery) => {
   const data = callbackQuery.data;
   const messageId = callbackQuery.message.message_id;
 
+  const registrationStatus =
+    await tgApi.sendWrongRegistrationActionsMessage(chatId);
+
+  const isRegistrationCompleted =
+    registrationStatus === types.registrationResults.COMPLETED;
+
   try {
     // Видаляємо клавіатуру після натискання
     await bot.editMessageReplyMarkup(
       { inline_keyboard: [] },
       { chat_id: chatId, message_id: messageId },
     );
-    const registrationStage = await dbApi.getRegistrationStage(chatId);
+    const { registration_stage: registrationStage } =
+      await dbApi.getUserStage(chatId);
 
     if (data.startsWith('direction_')) {
       const direction = data.replace('direction_', '');
       await tgApi.saveUserInfo.direction(chatId, direction);
-      await dbApi.setRegistrationStage(chatId, 'waiting_for_stream');
+      await dbApi.setRegistrationStage(
+        chatId,
+        isRegistrationCompleted
+          ? types.registrationResults.COMPLETED
+          : types.registartionStages[types.dbUserDataFields.STREAM].value,
+      );
       await tgApi.sendStreamSelectionButtons(chatId, direction);
     } else if (data.startsWith('stream_')) {
       const stream = data.replace('stream_', '');
       await tgApi.saveUserInfo.stream(chatId, stream);
-      if (registrationStage !== 'completed') {
-        await dbApi.setRegistrationStage(chatId, 'completed');
+      if (
+        registrationStage !== types.registrationResults.COMPLETED &&
+        registrationStatus === types.registrationResults.NOT_COMPLETED
+      ) {
+        await dbApi.setRegistrationStage(
+          chatId,
+          types.registrationResults.COMPLETED,
+        );
         await tgApi.sendMainMenu(chatId, true); // true - показати вітальне повідомлення
       } else {
         await tgApi.sendMainMenu(chatId);
