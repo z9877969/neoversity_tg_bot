@@ -1,5 +1,6 @@
 const mysql = require('mysql2/promise');
-const { env } = require('../constants');
+const { env, types } = require('../constants');
+const { getMissingUserDataFields } = require('../utils');
 
 const dbConfig = {
   host: env.DB_HOST,
@@ -22,12 +23,22 @@ async function setRegistrationStage(chatId, stage) {
   );
 }
 
-async function getRegistrationStage(chatId) {
-  const [rows] = await db.execute(
-    'SELECT registration_stage FROM users WHERE telegram_id = ?',
-    [chatId],
-  );
-  return rows.length > 0 ? rows[0].registration_stage : 'not_registered';
+async function initializeUser(chatId) {
+  const sql =
+    "INSERT INTO users (telegram_id, registration_stage) \
+      VALUES (?, 'waiting_for_name')";
+  await db.execute(sql, [chatId]);
+}
+
+async function getUserUnregisterFieldData(chatId) {
+  const userData = await getUserData(chatId);
+  if (!userData) {
+    return null;
+  }
+  const missingUserData = getMissingUserDataFields(userData);
+  return missingUserData.length > 0
+    ? missingUserData[0]
+    : { stage: types.registrationResults.COMPLETED };
 }
 
 async function setEditStage(chatId, stage) {
@@ -37,12 +48,18 @@ async function setEditStage(chatId, stage) {
   ]);
 }
 
-async function getEditStage(chatId) {
+async function getUserStage(chatId) {
   const [rows] = await db.execute(
-    'SELECT edit_stage FROM users WHERE telegram_id = ?',
+    // 'SELECT edit_stage FROM users WHERE telegram_id = ?',
+    'SELECT edit_stage, registration_stage FROM users WHERE telegram_id = ?',
     [chatId],
   );
-  return rows.length > 0 ? rows[0].edit_stage : 'null';
+  return rows.length > 0
+    ? rows[0]
+    : {
+        edit_stage: 'null',
+        registration_stage: types.registrationResults.NOT_REGISTERED,
+      };
 }
 
 async function getUserDirection(chatId) {
@@ -139,10 +156,11 @@ const getManagerContactsByStream = async (stream) => {
 
 module.exports = {
   db,
+  initializeUser,
+  getUserUnregisterFieldData,
   setRegistrationStage,
-  getRegistrationStage,
   setEditStage,
-  getEditStage,
+  getUserStage,
   getUserDirection,
   getUserStream,
   getUserData,
