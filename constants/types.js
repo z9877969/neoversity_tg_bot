@@ -15,19 +15,19 @@ const registartionTypes = {
 const registartionStages = {
   [dbUserDataFields.FULL_NAME]: {
     step: 1,
-    value: 'waiting_for_name',
+    value: registartionTypes.WAITING_FOR_NAME,
   },
   [dbUserDataFields.EMAIL]: {
     step: 2,
-    value: 'waiting_for_email',
+    value: registartionTypes.WAITING_FOR_EMAIL,
   },
   [dbUserDataFields.DIRECTION]: {
     step: 3,
-    value: 'waiting_for_direction',
+    value: registartionTypes.WAITING_FOR_DIRECTION,
   },
   [dbUserDataFields.STREAM]: {
     step: 4,
-    value: 'waiting_for_stream',
+    value: registartionTypes.WAITING_FOR_STREAM,
   },
 };
 
