@@ -32,15 +32,13 @@ const registartionStages = {
 };
 
 const callbackTypes = {
-  [dbUserDataFields.DIRECTION]:
-    registartionStages[dbUserDataFields.DIRECTION].value,
-  [dbUserDataFields.STREAM]: registartionStages[dbUserDataFields.STREAM].value,
+  [dbUserDataFields.DIRECTION]: registartionTypes.WAITING_FOR_DIRECTION,
+  [dbUserDataFields.STREAM]: registartionTypes.WAITING_FOR_STREAM,
 };
 
 const messageTypes = {
-  [dbUserDataFields.FULL_NAME]:
-    registartionStages[dbUserDataFields.FULL_NAME].value,
-  [dbUserDataFields.EMAIL]: registartionStages[dbUserDataFields.EMAIL].value,
+  [dbUserDataFields.FULL_NAME]: registartionTypes.WAITING_FOR_NAME,
+  [dbUserDataFields.EMAIL]: registartionTypes.WAITING_FOR_EMAIL,
 };
 
 const registrationResults = {

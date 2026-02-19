@@ -62,28 +62,22 @@ bot.on('message', async (msg) => {
       } else if (text === 'Редагувати напрямок') {
         await dbApi.setEditStage(
           chatId,
-          types.registartionStages[types.dbUserDataFields.DIRECTION].value,
+          types.registartionTypes.WAITING_FOR_DIRECTION,
         );
         await tgApi.sendDirectionSelectionButtons(chatId);
       } else if (text === 'Редагувати потік') {
         const direction = await dbApi.getUserDirection(chatId);
         await dbApi.setEditStage(
           chatId,
-          types.registartionStages[types.dbUserDataFields.STREAM].value,
+          types.registartionTypes.WAITING_FOR_STREAM,
         );
         await tgApi.sendStreamSelectionButtons(chatId, direction);
       }
       // Якщо команду не розпізнано
       else {
-        if (
-          editStage ===
-          types.registartionStages[types.dbUserDataFields.DIRECTION].value
-        ) {
+        if (editStage === types.registartionTypes.WAITING_FOR_DIRECTION) {
           await tgApi.sendDirectionSelectionButtons(chatId);
-        } else if (
-          editStage ===
-          types.registartionStages[types.dbUserDataFields.STREAM].value
-        ) {
+        } else if (editStage === types.registartionTypes.WAITING_FOR_STREAM) {
           const direction = await dbApi.getUserDirection(chatId);
           await tgApi.sendStreamSelectionButtons(chatId, direction);
         } else {
@@ -97,15 +91,13 @@ bot.on('message', async (msg) => {
     // Логіка реєстрації
     else {
       if (
-        registrationStatus ===
-          types.registartionStages[types.dbUserDataFields.FULL_NAME].value &&
+        registrationStatus === types.registartionTypes.WAITING_FOR_NAME &&
         /^[\p{L} '-]+$/u.test(text)
       ) {
         await tgApi.saveUserInfo.fullName(chatId, text);
         await bot.sendMessage(chatId, 'Тепер надішліть вашу електронну пошту');
       } else if (
-        registrationStatus ===
-        types.registartionStages[types.dbUserDataFields.EMAIL].value
+        registrationStatus === types.registartionTypes.WAITING_FOR_EMAIL
       ) {
         if (/\S+@\S+\.\S+/.test(text)) {
           // Проста валідація email
@@ -118,10 +110,8 @@ bot.on('message', async (msg) => {
           );
         }
       } else if (
-        registrationStatus ===
-          types.registartionStages[types.dbUserDataFields.DIRECTION].value ||
-        registrationStatus ===
-          types.registartionStages[types.dbUserDataFields.STREAM].value
+        registrationStatus === types.registartionTypes.WAITING_FOR_DIRECTION ||
+        registrationStatus === types.registartionTypes.WAITING_FOR_STREAM
       ) {
         await tgApi.sendWrongRegistrationActionsMessage(chatId);
       }
@@ -179,7 +169,7 @@ bot.on('callback_query', async (callbackQuery) => {
       await tgApi.saveUserInfo.direction(chatId, direction);
       await dbApi.setEditStage(
         chatId,
-        types.registartionStages[types.dbUserDataFields.STREAM].value,
+        types.registartionTypes.WAITING_FOR_STREAM,
       );
       await tgApi.sendStreamSelectionButtons(chatId, direction);
     } else if (data.startsWith('stream_')) {

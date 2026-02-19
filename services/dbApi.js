@@ -25,7 +25,7 @@ async function setRegistrationStage(chatId, stage) {
 
 async function initializeUser(chatId) {
   const sql = `INSERT INTO users (telegram_id, registration_stage)
-      VALUES (?, ${types.registartionStages[types.dbUserDataFields.FULL_NAME].value}) `;
+      VALUES (?, ${types.registartionTypes.WAITING_FOR_NAME}) `;
   await db.execute(sql, [chatId]);
 }
 
