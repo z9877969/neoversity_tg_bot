@@ -3,3 +3,4 @@ module.exports.buttonsDict = require('./buttonsDict');
 module.exports.streamsDict = require('./streamsDict');
 module.exports.directionsBtns = require('./directionsBtns');
 module.exports.env = require('./envConfig');
+module.exports.types = require('./types');
