@@ -17,14 +17,14 @@ const endMessagePart = {
 
 /**
  * Створює повідомлення для користувача про незавершену реєстрацію, вказуючи, яке поле потрібно заповнити.
- * @param {Object} unregisterFildData - Дані про незаповнене поле користувача
+ * @param {Object} unregisterField - Незаповнене поле користувача
  * @returns {string} Повідомлення для користувача
  */
 
-const createUnregisterUserMessage = (unregisterFildData) => {
-  return unregisterFildData.field in endMessagePart.callback_query
-    ? `${startMessagePart.callback_query}${endMessagePart.callback_query[unregisterFildData.field]}.`
-    : `${startMessagePart.message}${endMessagePart.message[unregisterFildData.field]}.`;
+const createUnregisterUserMessage = (unregisterField) => {
+  return unregisterField in endMessagePart.callback_query
+    ? `${startMessagePart.callback_query}${endMessagePart.callback_query[unregisterField]}.`
+    : `${startMessagePart.message}${endMessagePart.message[unregisterField]}.`;
 };
 
 module.exports = createUnregisterUserMessage;

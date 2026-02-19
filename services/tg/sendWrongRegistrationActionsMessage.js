@@ -16,43 +16,30 @@ const callbackMessageSenderMap = {
  * @returns {string} 'completed' | 'not_completed' | null - Чи користувач заповненив всі поля і реєстрація є завершеною
  */
 
-const sendWrongRegistrationActionsMessage = async (chatId) => {
-  const unregisterFieldData = await dbApi.getUserUnregisterFieldData(chatId);
-
-  if (unregisterFieldData === null) {
-    return types.registrationResults.NOT_REGISTERED;
-  }
-
-  if (unregisterFieldData?.stage === types.registrationResults.COMPLETED) {
-    return types.registrationResults.COMPLETED;
-  }
-
-  if (
-    unregisterFieldData?.stage !==
-    types.registartionStages[unregisterFieldData.field].value
-  ) {
-    const messageText = createUnregisterUserMessage(unregisterFieldData);
+const sendWrongRegistrationActionsMessage = async (
+  chatId,
+  { stage, field },
+) => {
+  if (stage !== types.registartionStages[field].value) {
+    const messageText = createUnregisterUserMessage(field);
     await bot.sendMessage(
       chatId,
       'Будь ласка, завершіть реєстрацію перед вибором опцій.\n' +
-        (unregisterFieldData.field in types.messageTypes ? messageText : ''),
+        (field in types.messageTypes ? messageText : ''),
     );
-    if (unregisterFieldData.field in callbackMessageSenderMap) {
-      await callbackMessageSenderMap[unregisterFieldData.field](chatId);
+    if (field in callbackMessageSenderMap) {
+      await callbackMessageSenderMap[field](chatId);
     }
-  } else if (unregisterFieldData?.field in types.callbackTypes) {
+  } else if (field in types.callbackTypes) {
     await bot.sendMessage(
       chatId,
       'Будь ласка, завершіть реєстрацію перед вибором опцій.\n' +
-        (unregisterFieldData.field in types.messageTypes ? messageText : ''),
+        (field in types.messageTypes ? messageText : ''),
     );
     const { direction } = await dbApi.getUserData(chatId);
     const args = direction ? [chatId, direction] : [chatId];
-    await callbackMessageSenderMap[unregisterFieldData.field](...args);
+    await callbackMessageSenderMap[field](...args);
   }
-  return unregisterFieldData?.stage === types.registrationResults.COMPLETED
-    ? types.registrationResults.COMPLETED
-    : types.registrationResults.NOT_COMPLETED;
 };
 
 module.exports = sendWrongRegistrationActionsMessage;
