@@ -13,7 +13,9 @@ const callbackMessageSenderMap = {
 /**
  * Перевіряє стан реєстрації користувача та надсилає відповідне повідомлення, якщо реєстрація не завершена.
  * @param {number} chatId ID чату
- * @returns {string} 'completed' | 'not_completed' | null - Чи користувач заповненив всі поля і реєстрація є завершеною
+ * @param {Object} registrationData - Дані про стан реєстрації користувача
+ * @param {string} registrationData.stage - Поточний етап реєстрації 
+ * @param {string} registrationData.field - Поле, яке не було заповнено
  */
 
 const sendWrongRegistrationActionsMessage = async (
