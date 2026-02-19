@@ -5,11 +5,11 @@ const dbUserDataFields = {
   STREAM: 'stream',
 };
 
-const registartionSteps = {
-  1: dbUserDataFields.FULL_NAME,
-  2: dbUserDataFields.EMAIL,
-  3: dbUserDataFields.DIRECTION,
-  4: dbUserDataFields.STREAM,
+const registartionTypes = {
+  WAITING_FOR_NAME: 'waiting_for_name',
+  WAITING_FOR_EMAIL: 'waiting_for_email',
+  WAITING_FOR_DIRECTION: 'waiting_for_direction',
+  WAITING_FOR_STREAM: 'waiting_for_stream',
 };
 
 const registartionStages = {
@@ -52,7 +52,7 @@ const registrationResults = {
 module.exports = {
   dbUserDataFields,
   registartionStages,
-  registartionSteps,
+  registartionTypes,
   callbackTypes,
   messageTypes,
   registrationResults,
