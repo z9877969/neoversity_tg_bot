@@ -10,8 +10,6 @@ bot.on('message', async (msg) => {
   const chatId = msg.chat.id;
   const text = msg.text || '';
 
-  console.log('text :>> ', text);
-
   try {
     // Перевіряємо, чи користувач завершив реєстрацію
     const registrationStatus =
