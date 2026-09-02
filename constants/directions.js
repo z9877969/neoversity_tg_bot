@@ -27,25 +27,25 @@ const dirrections = {
     name: 'Artificial Intelligence and Machine Learning',
     value: 'AI_ML',
     shortcut: 'AI&ML',
-    streamsNum: [1, 2, 3, 4],
+    streamsNum: [1, 2, 3, 4, 5],
   },
   SE_AI: {
     name: 'Software Engineering and Artificial Intelligence',
     value: 'SE_AI',
     shortcut: 'SE&AI',
-    streamsNum: [1, 2, 3],
+    streamsNum: [1, 2, 3, 4],
   },
   CB_AI: {
     name: 'Cybersecurity and Artificial Intelligence',
     value: 'CB_AI',
     shortcut: 'CB&AI',
-    streamsNum: [1, 2, 3],
+    streamsNum: [1, 2, 3, 4],
   },
   AI_PM: {
     name: 'Artificial Intelligence Product Management',
     value: 'AI_PM',
     shortcut: 'AI&PM',
-    streamsNum: [1, 2],
+    streamsNum: [1, 2, 3],
   },
 };
 
